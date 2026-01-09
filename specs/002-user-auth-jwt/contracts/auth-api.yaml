@@ -1,0 +1,475 @@
+openapi: 3.0.3
+info:
+  title: Todo Authentication API
+  description: |
+    JWT-based authentication for Todo application.
+
+    **Authentication Flow**:
+    1. User registers/logs in via Better Auth (Next.js frontend)
+    2. Better Auth issues JWT token signed with shared secret
+    3. Frontend attaches token to all API requests: `Authorization: Bearer <token>`
+    4. FastAPI validates token signature and extracts user identity
+
+    **Token Format**: HS256-signed JWT with standard claims (sub, email, iat, exp)
+  version: 2.0.0
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server (FastAPI backend)
+  - url: http://localhost:3000
+    description: Local development server (Next.js frontend with Better Auth)
+
+tags:
+  - name: authentication
+    description: Authentication endpoints (handled by Better Auth on Next.js)
+  - name: tasks
+    description: Protected task endpoints (require JWT authentication)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token issued by Better Auth.
+
+        **Header Format**: `Authorization: Bearer <token>`
+
+        **Token Structure**:
+        - Algorithm: HS256
+        - Claims: sub (user ID), email, iat (issued at), exp (expiration)
+        - Expiration: 24 hours from issuance
+
+  schemas:
+    JWTToken:
+      type: object
+      description: JWT token structure (decoded payload)
+      required:
+        - sub
+        - email
+        - iat
+        - exp
+      properties:
+        sub:
+          type: string
+          description: User ID (subject claim)
+          example: "123"
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "user@example.com"
+        iat:
+          type: integer
+          description: Issued at timestamp (Unix epoch)
+          example: 1704801600
+        exp:
+          type: integer
+          description: Expiration timestamp (Unix epoch, iat + 24 hours)
+          example: 1704888000
+
+    AuthError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              enum:
+                - MISSING_TOKEN
+                - INVALID_TOKEN
+                - TOKEN_EXPIRED
+              description: Error code for programmatic handling
+            message:
+              type: string
+              description: Human-readable error message
+            details:
+              type: object
+              description: Additional error context
+      example:
+        error:
+          code: "TOKEN_EXPIRED"
+          message: "Token has expired"
+          details: {}
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Buy groceries"
+        description:
+          type: string
+          nullable: true
+          example: "Milk, eggs, bread"
+        is_completed:
+          type: boolean
+          example: false
+        user_id:
+          type: integer
+          example: 123
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-01-09T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-01-09T10:30:00Z"
+
+    TaskListResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        total:
+          type: integer
+          example: 5
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+
+paths:
+  # Note: Registration and login endpoints are handled by Better Auth on Next.js
+  # These are documented here for reference only - FastAPI does not implement them
+
+  /auth/register:
+    post:
+      tags:
+        - authentication
+      summary: Register new user (Better Auth endpoint)
+      description: |
+        **Handled by Better Auth on Next.js frontend - not implemented in FastAPI**
+
+        Creates new user account and returns JWT token.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: "SecurePass123!"
+      responses:
+        '201':
+          description: User registered successfully, JWT token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT access token
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 123
+                      email:
+                        type: string
+                        example: "user@example.com"
+        '400':
+          description: Validation error or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+
+  /auth/login:
+    post:
+      tags:
+        - authentication
+      summary: Login user (Better Auth endpoint)
+      description: |
+        **Handled by Better Auth on Next.js frontend - not implemented in FastAPI**
+
+        Authenticates user and returns JWT token.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "SecurePass123!"
+      responses:
+        '200':
+          description: Login successful, JWT token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT access token
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 123
+                      email:
+                        type: string
+                        example: "user@example.com"
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+
+  # Protected endpoints - require JWT authentication
+  /tasks:
+    get:
+      tags:
+        - tasks
+      summary: List all tasks for authenticated user
+      description: |
+        Returns all tasks owned by the authenticated user.
+        User identity extracted from JWT token - no user_id parameter needed.
+      operationId: listTasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: completed
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by completion status
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+        '401':
+          description: Missing, invalid, or expired JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+
+    post:
+      tags:
+        - tasks
+      summary: Create new task for authenticated user
+      description: |
+        Creates a new task owned by the authenticated user.
+        User identity extracted from JWT token - no user_id in request body.
+      operationId: createTask
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                  maxLength: 500
+                  example: "Buy groceries"
+                description:
+                  type: string
+                  maxLength: 5000
+                  example: "Milk, eggs, bread"
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Missing, invalid, or expired JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tasks/{task_id}:
+    get:
+      tags:
+        - tasks
+      summary: Get single task
+      description: |
+        Retrieves a task by ID. User can only access their own tasks.
+        Ownership verified using JWT-extracted user identity.
+      operationId: getTask
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Missing, invalid, or expired JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '404':
+          description: Task not found or user doesn't own it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - tasks
+      summary: Update task
+      description: |
+        Updates a task. User can only update their own tasks.
+        Ownership verified using JWT-extracted user identity.
+      operationId: updateTask
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 500
+                description:
+                  type: string
+                  maxLength: 5000
+                is_completed:
+                  type: boolean
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Missing, invalid, or expired JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '404':
+          description: Task not found or user doesn't own it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - tasks
+      summary: Delete task
+      description: |
+        Deletes a task. User can only delete their own tasks.
+        Ownership verified using JWT-extracted user identity.
+      operationId: deleteTask
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Task deleted successfully
+        '401':
+          description: Missing, invalid, or expired JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+        '404':
+          description: Task not found or user doesn't own it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

@@ -1,0 +1,284 @@
+openapi: 3.0.3
+info:
+  title: Better Auth API
+  description: Authentication API for user registration, login, and session management
+  version: 1.0.0
+  contact:
+    name: Better Auth
+    url: https://better-auth.com
+
+servers:
+  - url: http://localhost:3000/api/auth
+    description: Development server (frontend)
+  - url: https://your-domain.com/api/auth
+    description: Production server
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account with email and password
+      operationId: registerUser
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 255
+                  description: User email address (must be unique)
+                  example: user@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  description: Password (min 8 chars, uppercase, lowercase, number)
+                  example: SecurePass123
+      responses:
+        '201':
+          description: User registered successfully
+          headers:
+            Set-Cookie:
+              description: JWT token in httpOnly cookie
+              schema:
+                type: string
+                example: better-auth.session_token=eyJhbGc...; HttpOnly; Max-Age=86400; Path=/; SameSite=Lax
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    description: JWT token (also set in httpOnly cookie)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Invalid input (email format, password requirements)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Invalid email format"
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Email already exists"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /login:
+    post:
+      summary: Sign in with email and password
+      description: Authenticates user and returns JWT token
+      operationId: loginUser
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User email address
+                  example: user@example.com
+                password:
+                  type: string
+                  description: User password
+                  example: SecurePass123
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: JWT token in httpOnly cookie
+              schema:
+                type: string
+                example: better-auth.session_token=eyJhbGc...; HttpOnly; Max-Age=86400; Path=/; SameSite=Lax
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    description: JWT token (also set in httpOnly cookie)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Invalid email or password"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /logout:
+    post:
+      summary: Sign out current user
+      description: Clears authentication session and httpOnly cookie
+      operationId: logoutUser
+      tags:
+        - Authentication
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          headers:
+            Set-Cookie:
+              description: Clear httpOnly cookie
+              schema:
+                type: string
+                example: better-auth.session_token=; HttpOnly; Max-Age=0; Path=/
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /session:
+    get:
+      summary: Get current session
+      description: Returns current authenticated user information
+      operationId: getSession
+      tags:
+        - Authentication
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Session retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: object
+                    properties:
+                      sub:
+                        type: string
+                        description: User ID
+                        example: "123"
+                      email:
+                        type: string
+                        example: user@example.com
+                      iat:
+                        type: integer
+                        description: Issued at (Unix timestamp)
+                        example: 1704844800
+                      exp:
+                        type: integer
+                        description: Expiration (Unix timestamp)
+                        example: 1704931200
+        '401':
+          description: Not authenticated or token expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Authentication required"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique user identifier
+          example: 123
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: user@example.com
+        created_at:
+          type: string
+          format: date-time
+          description: Account creation timestamp (ISO 8601)
+          example: "2026-01-09T10:30:00Z"
+      required:
+        - id
+        - email
+        - created_at
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid input"
+        detail:
+          type: string
+          description: Detailed error information (optional)
+          example: "Email format is invalid"
+      required:
+        - error
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+      description: JWT token stored in httpOnly cookie
+
+security:
+  - cookieAuth: []
+
+tags:
+  - name: Authentication
+    description: User authentication and session management

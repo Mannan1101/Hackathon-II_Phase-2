@@ -1,0 +1,81 @@
+// Prisma schema for Better Auth with Neon PostgreSQL
+// This schema defines all models required by Better Auth
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - Core authentication entity
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("users")
+}
+
+// Session model - Manages user sessions
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// Account model - For OAuth providers and password storage
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  idToken           String?
+  expiresAt         DateTime?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+// Verification model - For email verification tokens
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@map("verifications")
+}

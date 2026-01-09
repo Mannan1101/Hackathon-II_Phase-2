@@ -1,0 +1,339 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Enhanced Modern Blue Theme - Light Mode */
+    /* Improved contrast ratios for WCAG AA compliance */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Vibrant yet professional blue primary */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Subtle secondary with better contrast */
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+
+    /* Improved muted colors */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Complementary accent - Purple */
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Enhanced destructive with better visibility */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs with subtle blue tint */
+    --border: 214 32% 88%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.5rem;
+
+    /* Complementary color palette */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    /* Additional accent colors */
+    --emerald: 160 84% 39%;
+    --emerald-foreground: 0 0% 100%;
+    --orange: 25 95% 53%;
+    --orange-foreground: 0 0% 100%;
+    --purple: 262 83% 58%;
+    --purple-foreground: 0 0% 100%;
+    --pink: 330 81% 60%;
+    --pink-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    /* Enhanced Dark Mode with improved contrast */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Brighter primary for dark mode visibility */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+
+    /* Enhanced secondary with better separation */
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Improved muted colors for dark mode */
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Vibrant purple accent for dark mode */
+    --accent: 262 83% 58%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Enhanced destructive for dark mode */
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Dark mode borders and inputs */
+    --border: 217 33% 24%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
+
+    /* Complementary colors adjusted for dark mode */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    /* Additional accent colors for dark mode */
+    --emerald: 160 84% 39%;
+    --emerald-foreground: 0 0% 100%;
+    --orange: 25 95% 53%;
+    --orange-foreground: 222 47% 11%;
+    --purple: 262 83% 58%;
+    --purple-foreground: 210 40% 98%;
+    --pink: 330 81% 60%;
+    --pink-foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Enhanced typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+    line-height: 1.2;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  p {
+    line-height: 1.7;
+  }
+
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection styles */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+
+  /* Scrollbar styling for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/30;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* Professional gradient backgrounds */
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.05) 0%, hsl(var(--background)) 100%);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-background/80 backdrop-blur-md border border-border/50;
+  }
+
+  /* Elevated card effect */
+  .card-elevated {
+    @apply shadow-lg hover:shadow-xl transition-shadow duration-300;
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Container with max width */
+  .container-custom {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  /* Text balance for better typography */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Responsive spacing utilities */
+  .section-padding {
+    @apply py-12 md:py-16 lg:py-24;
+  }
+
+  .section-padding-sm {
+    @apply py-8 md:py-12 lg:py-16;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  /* Enhanced hover effects */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-[0_0_20px_rgba(var(--primary),0.3)];
+  }
+
+  /* Gradient text utilities */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent;
+  }
+
+  .gradient-success {
+    @apply bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent;
+  }
+
+  /* Glassmorphism effects */
+  .glass-panel {
+    @apply bg-background/80 backdrop-blur-md border border-border/50 shadow-xl;
+  }
+
+  .glass-card {
+    @apply bg-background/95 backdrop-blur-sm border-2 border-primary/20 shadow-2xl;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

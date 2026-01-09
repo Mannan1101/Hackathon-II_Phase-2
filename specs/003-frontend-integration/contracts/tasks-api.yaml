@@ -1,0 +1,373 @@
+openapi: 3.0.3
+info:
+  title: Tasks API
+  description: RESTful API for task management with user isolation
+  version: 1.0.0
+  contact:
+    name: Backend API (Spec-1)
+
+servers:
+  - url: http://localhost:8000
+    description: Development server (backend)
+  - url: http://localhost:8001
+    description: Alternative development server
+  - url: https://your-backend-domain.com
+    description: Production server
+
+paths:
+  /tasks:
+    get:
+      summary: List all tasks for authenticated user
+      description: Returns all tasks belonging to the authenticated user
+      operationId: listTasks
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+              example:
+                - id: 1
+                  title: "Complete project documentation"
+                  description: "Write comprehensive docs for the API"
+                  is_completed: false
+                  user_id: 123
+                  created_at: "2026-01-09T10:00:00Z"
+                  updated_at: "2026-01-09T10:00:00Z"
+                - id: 2
+                  title: "Review pull requests"
+                  description: null
+                  is_completed: true
+                  user_id: 123
+                  created_at: "2026-01-08T15:30:00Z"
+                  updated_at: "2026-01-09T09:00:00Z"
+        '401':
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "Invalid authentication credentials"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Create a new task
+      description: Creates a new task for the authenticated user
+      operationId: createTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+            example:
+              title: "Implement user authentication"
+              description: "Add JWT-based authentication to the API"
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+              example:
+                id: 3
+                title: "Implement user authentication"
+                description: "Add JWT-based authentication to the API"
+                is_completed: false
+                user_id: 123
+                created_at: "2026-01-09T11:00:00Z"
+                updated_at: "2026-01-09T11:00:00Z"
+        '400':
+          description: Invalid input (missing title, exceeds length limits)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "Title is required"
+        '401':
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tasks/{id}:
+    get:
+      summary: Get a single task by ID
+      description: Returns a task if it belongs to the authenticated user
+      operationId: getTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - invalid or missing JWT token, or task doesn't belong to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "Not authorized to access this task"
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "Task not found"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update a task
+      description: Updates a task if it belongs to the authenticated user
+      operationId: updateTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+            example:
+              title: "Complete project documentation (updated)"
+              is_completed: true
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid input (exceeds length limits)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - invalid or missing JWT token, or task doesn't belong to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete a task
+      description: Deletes a task if it belongs to the authenticated user
+      operationId: deleteTask
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task deleted successfully"
+        '401':
+          description: Unauthorized - invalid or missing JWT token, or task doesn't belong to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique task identifier
+          example: 1
+        title:
+          type: string
+          maxLength: 500
+          description: Task title/summary
+          example: "Complete project documentation"
+        description:
+          type: string
+          maxLength: 5000
+          nullable: true
+          description: Detailed task description (optional)
+          example: "Write comprehensive docs for the API"
+        is_completed:
+          type: boolean
+          description: Completion status
+          example: false
+        user_id:
+          type: integer
+          description: Owner of the task
+          example: 123
+        created_at:
+          type: string
+          format: date-time
+          description: Task creation timestamp (ISO 8601)
+          example: "2026-01-09T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Last modification timestamp (ISO 8601)
+          example: "2026-01-09T10:00:00Z"
+      required:
+        - id
+        - title
+        - is_completed
+        - user_id
+        - created_at
+        - updated_at
+
+    TaskCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+          description: Task title/summary (required)
+          example: "Implement user authentication"
+        description:
+          type: string
+          maxLength: 5000
+          nullable: true
+          description: Detailed task description (optional)
+          example: "Add JWT-based authentication to the API"
+      required:
+        - title
+
+    TaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+          description: Task title/summary (optional)
+          example: "Complete project documentation (updated)"
+        description:
+          type: string
+          maxLength: 5000
+          nullable: true
+          description: Detailed task description (optional)
+          example: "Write comprehensive docs for the API and examples"
+        is_completed:
+          type: boolean
+          description: Completion status (optional)
+          example: true
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: "Invalid input"
+      required:
+        - detail
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from Better Auth (extracted from httpOnly cookie)
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Tasks
+    description: Task management operations with user isolation

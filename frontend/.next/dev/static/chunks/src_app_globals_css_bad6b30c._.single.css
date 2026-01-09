@@ -1,0 +1,249 @@
+/* [project]/src/app/globals.css [app-client] (css) */
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 88%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    --radius: .5rem;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --emerald: 160 84% 39%;
+    --emerald-foreground: 0 0% 100%;
+    --orange: 25 95% 53%;
+    --orange-foreground: 0 0% 100%;
+    --purple: 262 83% 58%;
+    --purple-foreground: 0 0% 100%;
+    --pink: 330 81% 60%;
+    --pink-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 24%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --emerald: 160 84% 39%;
+    --emerald-foreground: 0 0% 100%;
+    --orange: 25 95% 53%;
+    --orange-foreground: 222 47% 11%;
+    --purple: 262 83% 58%;
+    --purple-foreground: 210 40% 98%;
+    --pink: 330 81% 60%;
+    --pink-foreground: 210 40% 98%;
+  }
+
+  @apply border-border;
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @apply bg-background text-foreground;
+
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  @apply font-bold tracking-tight;
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+  }
+
+  @apply text-4xl md:text-5xl lg:text-6xl;
+
+  @apply text-3xl md:text-4xl lg:text-5xl;
+
+  @apply text-2xl md:text-3xl lg:text-4xl;
+
+  p {
+    line-height: 1.7;
+  }
+
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+
+  @apply bg-primary / 20 text-foreground;
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  @apply bg-muted / 30;
+
+  @apply bg-muted-foreground / 30 rounded-full;
+
+  @apply bg-muted-foreground / 50;
+}
+
+@layer components {
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--primary) / .05) 0%, hsl(var(--background)) 100%);
+  }
+
+  @apply bg-gradient-to-r from-primary to-primary / 70 bg-clip-text text-transparent;
+
+  @apply bg-background / 80 backdrop-blur-md border border-border / 50;
+
+  @apply shadow-lg hover:shadow-xl transition-shadow duration-300;
+
+  @apply transition-all duration-300 ease-in-out;
+
+  @apply container mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  @apply py-12 md:py-16 lg:py-24;
+
+  @apply py-8 md:py-12 lg:py-16;
+
+  .animate-fade-in {
+    animation: .5s ease-in-out fadeIn;
+  }
+
+  .animate-slide-up {
+    animation: .5s ease-out slideUp;
+  }
+
+  .animate-scale-in {
+    animation: .3s ease-out scaleIn;
+  }
+
+  @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl;
+
+  @apply transition-all duration-300 hover:shadow-[0_0_20px_rgba(var(--primary), .3) ];
+
+  @apply bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent;
+
+  @apply bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent;
+
+  @apply bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent;
+
+  @apply bg-background / 80 backdrop-blur-md border border-border / 50 shadow-xl;
+
+  @apply bg-background / 95 backdrop-blur-sm border-2 border-primary / 20 shadow-2xl;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: 1s linear infinite spin;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse {
+  animation: 2s cubic-bezier(.4, 0, .6, 1) infinite pulse;
+}
+
+/*# sourceMappingURL=src_app_globals_css_bad6b30c._.single.css.map*/
